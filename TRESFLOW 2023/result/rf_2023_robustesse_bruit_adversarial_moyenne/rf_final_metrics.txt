@@ -1,0 +1,100 @@
+===== RANDOM FOREST FINAL + ROBUSTESSE - CICIoT2023 =====
+
+===== FICHIERS UTILISES =====
+Train      : C:\Users\DELL\Desktop\pfe 2023\result\train_clean.csv
+Validation : C:\Users\DELL\Desktop\pfe 2023\result\val_clean.csv
+Test       : C:\Users\DELL\Desktop\pfe 2023\result\test_clean_no_similarity.csv
+
+===== CONFIGURATION =====
+Best seed         : 0
+N estimators      : 200
+Max depth         : None
+Class weight      : balanced
+Robustesse sample : 1202
+Niveaux bruit     : [0.01, 0.03, 0.05, 0.1]
+Repetitions bruit : 5
+Niveaux adversarial : [0.01, 0.03, 0.05, 0.1]
+
+===== FEATURES =====
+- IAT
+- Header_Length
+- Protocol Type
+- flow_duration
+- rst_count
+- Tot size
+- Magnitue
+- AVG
+
+===== CLASSES =====
+0 -> BenignTraffic
+1 -> DDoS-ICMP_Flood
+2 -> DDoS-SYN_Flood
+3 -> DDoS-UDP_Flood
+
+===== RESULTATS VALIDATION =====
+Accuracy validation      : 0.998897
+Precision Macro val      : 0.996467
+Recall Macro val         : 0.998980
+F1 Macro val             : 0.997713
+Matrice validation :
+[[1171    0    1    0]
+ [   6 7293    0    0]
+ [   1    0 4113    0]
+ [   9    3    0 5540]]
+
+===== RESULTATS TEST SANS PERTURBATION =====
+Accuracy Score     : 0.994176
+Precision Macro    : 0.992682
+Recall Macro       : 0.981820
+F1 Macro           : 0.987170
+Precision Weighted : 0.994181
+Recall Weighted    : 0.994176
+F1 Weighted        : 0.994151
+
+===== CLASSIFICATION REPORT =====
+                 precision    recall  f1-score   support
+
+  BenignTraffic       0.99      1.00      1.00       892
+DDoS-ICMP_Flood       0.98      0.97      0.97        59
+ DDoS-SYN_Flood       1.00      0.97      0.98        96
+ DDoS-UDP_Flood       0.99      0.99      0.99       155
+
+       accuracy                           0.99      1202
+      macro avg       0.99      0.98      0.99      1202
+   weighted avg       0.99      0.99      0.99      1202
+
+===== CONFUSION MATRIX =====
+[[891   0   0   1]
+ [  2  57   0   0]
+ [  2   1  93   0]
+ [  1   0   0 154]]
+
+===== FEATURE IMPORTANCE =====
+Protocol Type : 0.213008
+Tot size : 0.183802
+Header_Length : 0.165278
+rst_count : 0.129782
+AVG : 0.125898
+Magnitue : 0.119498
+flow_duration : 0.047402
+IAT : 0.015333
+
+===== ROBUSTESSE BRUIT + ADVERSARIAL SIMPLIFIE =====
+   Dataset        Modele          Perturbation         Niveau  Accuracy  Accuracy_std  F1_macro  F1_macro_std  Perte_F1_macro
+CICIoT2023 Random Forest                Aucune             0%  0.994176      0.000000  0.987170      0.000000        0.000000
+CICIoT2023 Random Forest       Bruit aleatoire             1%  0.973378      0.003902  0.925651      0.011666        0.061519
+CICIoT2023 Random Forest       Bruit aleatoire             3%  0.953078      0.002764  0.866432      0.012264        0.120738
+CICIoT2023 Random Forest       Bruit aleatoire             5%  0.935940      0.006068  0.827077      0.013416        0.160092
+CICIoT2023 Random Forest       Bruit aleatoire            10%  0.896007      0.009068  0.745680      0.019014        0.241490
+CICIoT2023 Random Forest Adversarial simplifie  1% (-epsilon)  0.956739      0.000000  0.872404      0.000000        0.114765
+CICIoT2023 Random Forest Adversarial simplifie  3% (-epsilon)  0.841930      0.000000  0.648969      0.000000        0.338200
+CICIoT2023 Random Forest Adversarial simplifie  5% (-epsilon)  0.759567      0.000000  0.516970      0.000000        0.470199
+CICIoT2023 Random Forest Adversarial simplifie 10% (-epsilon)  0.637271      0.000000  0.406483      0.000000        0.580687
+
+===== FICHIERS GENERES =====
+Modele RF              : C:\Users\DELL\Desktop\pfe 2023\result\rf_2023_robustesse_bruit_adversarial_moyenne\rf_final_4classes.pkl
+Labels json            : C:\Users\DELL\Desktop\pfe 2023\result\rf_2023_robustesse_bruit_adversarial_moyenne\rf_labels.json
+Confusion matrix       : C:\Users\DELL\Desktop\pfe 2023\result\rf_2023_robustesse_bruit_adversarial_moyenne\rf_confusion_matrix.png
+Feature importance     : C:\Users\DELL\Desktop\pfe 2023\result\rf_2023_robustesse_bruit_adversarial_moyenne\rf_feature_importance.png
+CSV robustesse         : C:\Users\DELL\Desktop\pfe 2023\result\rf_2023_robustesse_bruit_adversarial_moyenne\rf_robustesse_bruit_adversarial_ciciot2023.csv
+Figure robustesse      : C:\Users\DELL\Desktop\pfe 2023\result\rf_2023_robustesse_bruit_adversarial_moyenne\rf_robustesse_bruit_adversarial_ciciot2023.png

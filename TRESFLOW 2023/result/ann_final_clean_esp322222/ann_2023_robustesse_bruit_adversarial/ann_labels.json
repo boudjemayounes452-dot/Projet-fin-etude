@@ -1,0 +1,6 @@
+{
+    "0": "BenignTraffic",
+    "1": "DDoS-ICMP_Flood",
+    "2": "DDoS-SYN_Flood",
+    "3": "DDoS-UDP_Flood"
+}

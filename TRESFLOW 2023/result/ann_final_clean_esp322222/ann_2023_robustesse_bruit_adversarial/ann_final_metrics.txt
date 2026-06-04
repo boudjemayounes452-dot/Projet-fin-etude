@@ -1,0 +1,87 @@
+===== ANN FINAL + ROBUSTESSE BRUIT + ADVERSARIAL - CICIoT2023 =====
+
+===== FICHIERS UTILISES =====
+Train      : C:\Users\DELL\Desktop\pfe 2023\result\train_clean.csv
+Validation : C:\Users\DELL\Desktop\pfe 2023\result\val_clean.csv
+Test       : C:\Users\DELL\Desktop\pfe 2023\result\test_clean_no_similarity.csv
+
+===== CONFIGURATION =====
+Best seed       : 21
+Epochs max      : 20
+Epochs executes : 20
+Batch size      : 64
+Learning rate   : 0.001
+Class weights   : {0: 4.090827067669173, 1: 0.6156143923964698, 2: 1.1000404367165386, 3: 0.8182638512903808}
+Robustesse sample size : 1202
+Niveaux bruit : [0.01, 0.03, 0.05, 0.1]
+Niveaux adversarial : [0.01, 0.03, 0.05, 0.1]
+
+===== FEATURES =====
+- IAT
+- Header_Length
+- Protocol Type
+- flow_duration
+- rst_count
+- Tot size
+- Magnitue
+- AVG
+
+===== CLASSES =====
+0 -> BenignTraffic
+1 -> DDoS-ICMP_Flood
+2 -> DDoS-SYN_Flood
+3 -> DDoS-UDP_Flood
+
+===== RESULTATS TEST SANS PERTURBATION =====
+Test Loss          : 0.050019
+Test Accuracy      : 0.988353
+Accuracy Score     : 0.988353
+Precision Macro    : 0.976754
+Recall Macro       : 0.954092
+F1 Macro           : 0.964688
+Precision Weighted : 0.988346
+Recall Weighted    : 0.988353
+F1 Weighted        : 0.988186
+
+===== CLASSIFICATION REPORT =====
+                 precision    recall  f1-score   support
+
+  BenignTraffic       1.00      1.00      1.00       892
+DDoS-ICMP_Flood       0.98      0.88      0.93        59
+ DDoS-SYN_Flood       0.97      0.95      0.96        96
+ DDoS-UDP_Flood       0.96      0.99      0.97       155
+
+       accuracy                           0.99      1202
+      macro avg       0.98      0.95      0.96      1202
+   weighted avg       0.99      0.99      0.99      1202
+
+===== CONFUSION MATRIX =====
+[[892   0   0   0]
+ [  1  52   3   3]
+ [  1   1  91   3]
+ [  2   0   0 153]]
+
+===== ROBUSTESSE BRUIT + ADVERSARIAL =====
+   Dataset Modele     Perturbation Niveau  Accuracy  F1_macro  Perte_F1_macro
+CICIoT2023    ANN           Aucune     0%  0.988353  0.964688        0.000000
+CICIoT2023    ANN  Bruit aleatoire     1%  0.989185  0.964527        0.000161
+CICIoT2023    ANN  Bruit aleatoire     3%  0.988353  0.963574        0.001114
+CICIoT2023    ANN  Bruit aleatoire     5%  0.988353  0.963010        0.001678
+CICIoT2023    ANN  Bruit aleatoire    10%  0.989185  0.968123       -0.003435
+CICIoT2023    ANN Adversarial FGSM     1%  0.988353  0.965327       -0.000639
+CICIoT2023    ANN Adversarial FGSM     3%  0.987521  0.965012       -0.000325
+CICIoT2023    ANN Adversarial FGSM     5%  0.985857  0.961887        0.002801
+CICIoT2023    ANN Adversarial FGSM    10%  0.983361  0.956497        0.008190
+
+===== FICHIERS GENERES =====
+Modele Keras final      : C:\Users\DELL\Desktop\pfe 2023\result\ann_2023_robustesse_bruit_adversarial\ann_final_4classes.keras
+Modele Keras best       : C:\Users\DELL\Desktop\pfe 2023\result\ann_2023_robustesse_bruit_adversarial\ann_final_4classes_best.keras
+Modele TFLite           : C:\Users\DELL\Desktop\pfe 2023\result\ann_2023_robustesse_bruit_adversarial\ann_final_4classes.tflite
+Header ESP32 .h         : C:\Users\DELL\Desktop\pfe 2023\result\ann_2023_robustesse_bruit_adversarial\ann_model_data.h
+Labels json             : C:\Users\DELL\Desktop\pfe 2023\result\ann_2023_robustesse_bruit_adversarial\ann_labels.json
+Normalisation json      : C:\Users\DELL\Desktop\pfe 2023\result\ann_2023_robustesse_bruit_adversarial\ann_normalization.json
+Loss curve              : C:\Users\DELL\Desktop\pfe 2023\result\ann_2023_robustesse_bruit_adversarial\ann_loss_curve.png
+Accuracy curve          : C:\Users\DELL\Desktop\pfe 2023\result\ann_2023_robustesse_bruit_adversarial\ann_accuracy_curve.png
+Confusion matrix figure : C:\Users\DELL\Desktop\pfe 2023\result\ann_2023_robustesse_bruit_adversarial\ann_confusion_matrix.png
+CSV robustesse          : C:\Users\DELL\Desktop\pfe 2023\result\ann_2023_robustesse_bruit_adversarial\ann_robustesse_bruit_adversarial_ciciot2023.csv
+Figure robustesse       : C:\Users\DELL\Desktop\pfe 2023\result\ann_2023_robustesse_bruit_adversarial\ann_robustesse_bruit_adversarial_ciciot2023.png
