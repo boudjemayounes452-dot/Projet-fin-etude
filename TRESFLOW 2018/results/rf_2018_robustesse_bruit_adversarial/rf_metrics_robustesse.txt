@@ -1,0 +1,105 @@
+===== RANDOM FOREST FINAL + ROBUSTESSE - CICIDS2018 =====
+
+===== FICHIERS UTILISES =====
+Train      : C:\Users\DELL\Desktop\DDOS12\PFE_DDOS\PFE_DDOS\scripts\train_2018_chrono_live_botnet10_encoded.csv
+Validation : C:\Users\DELL\Desktop\DDOS12\PFE_DDOS\PFE_DDOS\scripts\val_2018_chrono_live_botnet10_encoded.csv
+Test       : C:\Users\DELL\Desktop\DDOS12\PFE_DDOS\PFE_DDOS\scripts\test_botnet90_external_chrono_encoded.csv
+
+===== CONFIGURATION =====
+Best seed         : 0
+N estimators      : 200
+Max depth         : None
+Class weight      : balanced
+Robustesse sample : 5000
+Niveaux bruit     : [0.01, 0.03, 0.05, 0.1]
+Niveaux adversarial : [0.01, 0.03, 0.05, 0.1]
+
+===== FEATURES =====
+- Init Bwd Win Bytes
+- Fwd Packet Length Max
+- Fwd Packet Length Std
+- Fwd IAT Min
+- Flow IAT Mean
+- Flow Bytes/s
+- Avg Packet Size
+- Total Fwd Packets
+
+===== RESULTATS VALIDATION =====
+Accuracy validation         : 0.999761
+Precision Attack validation : 0.999820
+Recall Attack validation    : 0.998022
+F1 Attack validation        : 0.998920
+F1 Macro validation         : 0.999393
+Matrice validation [[TN FP], [FN TP]] :
+[[89331     2]
+ [   22 11098]]
+
+===== RESULTATS TEST SANS PERTURBATION =====
+Accuracy           : 0.996807
+Precision Attack   : 0.964580
+Recall Attack      : 0.998950
+F1 Attack          : 0.981464
+Precision Macro    : 0.982241
+Recall Macro       : 0.997780
+F1 Macro           : 0.989859
+Precision Weighted : 0.996914
+Recall Weighted    : 0.996807
+F1 Weighted        : 0.996833
+False Positive Rate: 0.003391
+Specificity        : 0.996609
+
+===== MATRICE DE CONFUSION TEST [[TN FP], [FN TP]] =====
+[[513503   1747]
+ [    50  47575]]
+
+===== DETAILS TEST =====
+Total NORMAL test        : 515250
+NORMAL bien classes      : 513503
+NORMAL classes ATTACK    : 1747
+Taux NORMAL bien classes : 0.996609
+
+Total ATTACK test        : 47625
+ATTACK bien detectees    : 47575
+ATTACK ratees NORMAL     : 50
+Taux detection ATTACK    : 0.998950
+
+===== FEATURE IMPORTANCE =====
+Total Fwd Packets : 0.244585
+Init Bwd Win Bytes : 0.204426
+Fwd IAT Min : 0.176112
+Fwd Packet Length Max : 0.171090
+Fwd Packet Length Std : 0.136875
+Flow IAT Mean : 0.031250
+Flow Bytes/s : 0.028543
+Avg Packet Size : 0.007119
+
+===== ROBUSTESSE BRUIT + ADVERSARIAL SIMPLIFIE =====
+   Dataset        Modele          Perturbation         Niveau  Accuracy  F1_macro  Perte_F1_macro
+CICIDS2018 Random Forest                Aucune             0%    0.9966  0.988820        0.000000
+CICIDS2018 Random Forest       Bruit aleatoire             1%    0.9564  0.825146        0.163674
+CICIDS2018 Random Forest       Bruit aleatoire             3%    0.9322  0.659254        0.329566
+CICIDS2018 Random Forest       Bruit aleatoire             5%    0.9208  0.584731        0.404089
+CICIDS2018 Random Forest       Bruit aleatoire            10%    0.9124  0.528206        0.460614
+CICIDS2018 Random Forest Adversarial simplifie  1% (-epsilon)    0.9226  0.530823        0.457997
+CICIDS2018 Random Forest Adversarial simplifie  3% (+epsilon)    0.9188  0.478841        0.509979
+CICIDS2018 Random Forest Adversarial simplifie  5% (+epsilon)    0.9188  0.478841        0.509979
+CICIDS2018 Random Forest Adversarial simplifie 10% (-epsilon)    0.9168  0.478297        0.510523
+
+===== CLASSIFICATION REPORT =====
+              precision    recall  f1-score   support
+
+      NORMAL       1.00      1.00      1.00    515250
+      ATTACK       0.96      1.00      0.98     47625
+
+    accuracy                           1.00    562875
+   macro avg       0.98      1.00      0.99    562875
+weighted avg       1.00      1.00      1.00    562875
+
+
+===== FICHIERS GENERES =====
+Modele RF          : C:\Users\DELL\Desktop\DDOS12\PFE_DDOS\PFE_DDOS\scripts\rf_2018_robustesse_bruit_adversarial\rf_final_2018_robustesse.joblib
+Labels json        : C:\Users\DELL\Desktop\DDOS12\PFE_DDOS\PFE_DDOS\scripts\rf_2018_robustesse_bruit_adversarial\rf_labels.json
+Matrice confusion  : C:\Users\DELL\Desktop\DDOS12\PFE_DDOS\PFE_DDOS\scripts\rf_2018_robustesse_bruit_adversarial\rf_confusion_matrix.png
+Feature importance : C:\Users\DELL\Desktop\DDOS12\PFE_DDOS\PFE_DDOS\scripts\rf_2018_robustesse_bruit_adversarial\rf_feature_importance.png
+CSV robustesse     : C:\Users\DELL\Desktop\DDOS12\PFE_DDOS\PFE_DDOS\scripts\rf_2018_robustesse_bruit_adversarial\rf_robustesse_bruit_adversarial_cicids2018.csv
+Figure robustesse  : C:\Users\DELL\Desktop\DDOS12\PFE_DDOS\PFE_DDOS\scripts\rf_2018_robustesse_bruit_adversarial\rf_robustesse_bruit_adversarial_cicids2018.png

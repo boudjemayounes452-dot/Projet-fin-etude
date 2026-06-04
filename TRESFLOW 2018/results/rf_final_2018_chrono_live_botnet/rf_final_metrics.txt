@@ -1,0 +1,91 @@
+===== RANDOM FOREST FINAL - 2018 CHRONO + LIVE + BOTNET =====
+
+===== FICHIERS UTILISES =====
+Train      : C:\Users\DELL\Desktop\DDOS12\PFE_DDOS\PFE_DDOS\scripts\train_2018_chrono_live_botnet10_encoded.csv
+Validation : C:\Users\DELL\Desktop\DDOS12\PFE_DDOS\PFE_DDOS\scripts\val_2018_chrono_live_botnet10_encoded.csv
+Test       : C:\Users\DELL\Desktop\DDOS12\PFE_DDOS\PFE_DDOS\scripts\test_botnet90_external_chrono_encoded.csv
+
+===== CONFIGURATION =====
+Best seed         : 0
+N estimators      : 200
+Max depth         : None
+Class weight      : balanced
+
+===== DISTRIBUTIONS =====
+Train:
+Label
+0    107467
+1    193883
+Name: count, dtype: int64
+
+Validation:
+Label
+0    89333
+1    11120
+Name: count, dtype: int64
+
+Test:
+Label
+0    515250
+1     47625
+Name: count, dtype: int64
+
+===== RESULTATS VALIDATION =====
+Accuracy validation         : 0.999761
+Precision Attack validation : 0.999820
+Recall Attack validation    : 0.998022
+F1 Attack validation        : 0.998920
+F1 Macro validation         : 0.999393
+Matrice validation [[TN FP], [FN TP]] :
+[[89331     2]
+ [   22 11098]]
+
+===== RESULTATS TEST EXTERNE BOTNET =====
+Accuracy           : 0.996807
+Precision Attack   : 0.964580
+Recall Attack      : 0.998950
+F1 Attack          : 0.981464
+Precision Macro    : 0.982241
+Recall Macro       : 0.997780
+F1 Macro           : 0.989859
+Precision Weighted : 0.996914
+Recall Weighted    : 0.996807
+F1 Weighted        : 0.996833
+False Positive Rate: 0.003391
+Specificity        : 0.996609
+
+===== MATRICE DE CONFUSION TEST [[TN FP], [FN TP]] =====
+[[513503   1747]
+ [    50  47575]]
+
+===== DETAILS TEST =====
+Total NORMAL test        : 515250
+NORMAL bien classés      : 513503
+NORMAL classés ATTACK    : 1747
+Taux NORMAL bien classés : 0.996609
+
+Total ATTACK test        : 47625
+ATTACK bien détectées    : 47575
+ATTACK ratées NORMAL     : 50
+Taux détection ATTACK    : 0.998950
+
+===== CLASSIFICATION REPORT =====
+              precision    recall  f1-score   support
+
+      NORMAL       1.00      1.00      1.00    515250
+      ATTACK       0.96      1.00      0.98     47625
+
+    accuracy                           1.00    562875
+   macro avg       0.98      1.00      0.99    562875
+weighted avg       1.00      1.00      1.00    562875
+
+
+===== FEATURE IMPORTANCE =====
+Total Fwd Packets : 0.244585
+Init Bwd Win Bytes : 0.204426
+Fwd IAT Min : 0.176112
+Fwd Packet Length Max : 0.171090
+Fwd Packet Length Std : 0.136875
+Flow IAT Mean : 0.031250
+Flow Bytes/s : 0.028543
+Avg Packet Size : 0.007119

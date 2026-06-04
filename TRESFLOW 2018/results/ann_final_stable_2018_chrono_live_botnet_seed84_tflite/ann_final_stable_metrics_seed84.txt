@@ -1,0 +1,105 @@
+===== ANN FINAL STABLE + TFLITE - 2018 CHRONO + LIVE + BOTNET =====
+
+===== FICHIERS UTILISES =====
+Train      : C:\Users\DELL\Desktop\DDOS12\PFE_DDOS\PFE_DDOS\scripts\train_2018_chrono_live_botnet10_encoded.csv
+Validation : C:\Users\DELL\Desktop\DDOS12\PFE_DDOS\PFE_DDOS\scripts\val_2018_chrono_live_botnet10_encoded.csv
+Test       : C:\Users\DELL\Desktop\DDOS12\PFE_DDOS\PFE_DDOS\scripts\test_botnet90_external_chrono_encoded.csv
+
+===== CONFIGURATION =====
+Best seed        : 84
+Epochs max       : 50
+Epochs executes  : 38
+Batch size       : 64
+Learning rate    : 0.0005
+Threshold        : 0.5
+Class weights    : {0: 1.4020583062707621, 1: 0.7771439476385242}
+Dropout          : 0.1
+EarlyStopping    : monitor=val_loss, patience=10, restore_best_weights=True
+ReduceLROnPlateau: monitor=val_loss, factor=0.5, patience=3, min_lr=0.00001
+
+===== FEATURES =====
+- Init Bwd Win Bytes
+- Fwd Packet Length Max
+- Fwd Packet Length Std
+- Fwd IAT Min
+- Flow IAT Mean
+- Flow Bytes/s
+- Avg Packet Size
+- Total Fwd Packets
+
+===== ARCHITECTURE ANN =====
+Input : 8 features normalisees
+Dense 32 ReLU
+Dropout 0.1
+Dense 16 ReLU
+Dropout 0.1
+Dense 1 Sigmoid
+Loss : binary_crossentropy
+Optimizer : Adam
+
+===== LABELS =====
+0 = NORMAL / BENIGN
+1 = ATTACK / BOTNET
+
+===== RESULTATS VALIDATION =====
+Accuracy validation         : 0.998636
+Precision Attack validation : 0.999636
+Recall Attack validation    : 0.988040
+F1 Attack validation        : 0.993804
+F1 Macro validation         : 0.996519
+Matrice validation [[TN FP], [FN TP]] :
+[[89329     4]
+ [  133 10987]]
+
+===== RESULTATS TEST EXTERNE BOTNET =====
+Accuracy           : 0.976878
+Precision Attack   : 0.788522
+Recall Attack      : 0.993050
+F1 Attack          : 0.879046
+Precision Macro    : 0.893932
+Recall Macro       : 0.984216
+F1 Macro           : 0.933132
+Precision Weighted : 0.981504
+Recall Weighted    : 0.976878
+F1 Weighted        : 0.978065
+False Positive Rate: 0.024617
+Specificity        : 0.975383
+
+===== MATRICE DE CONFUSION TEST [[TN FP], [FN TP]] =====
+[[502566  12684]
+ [   331  47294]]
+
+===== DETAILS TEST =====
+Total NORMAL test        : 515250
+NORMAL bien classes      : 502566
+NORMAL classes ATTACK    : 12684
+Taux NORMAL bien classes : 0.975383
+
+Total ATTACK test        : 47625
+ATTACK bien detectees    : 47294
+ATTACK ratees NORMAL     : 331
+Taux detection ATTACK    : 0.993050
+
+===== CLASSIFICATION REPORT =====
+              precision    recall  f1-score   support
+
+      NORMAL       1.00      0.98      0.99    515250
+      ATTACK       0.79      0.99      0.88     47625
+
+    accuracy                           0.98    562875
+   macro avg       0.89      0.98      0.93    562875
+weighted avg       0.98      0.98      0.98    562875
+
+
+===== FIGURES =====
+Matrice confusion  : C:\Users\DELL\Desktop\DDOS12\PFE_DDOS\PFE_DDOS\scripts\ann_final_stable_2018_chrono_live_botnet_seed84_tflite\ann_confusion_matrix_stable_seed84.png
+Courbe loss        : C:\Users\DELL\Desktop\DDOS12\PFE_DDOS\PFE_DDOS\scripts\ann_final_stable_2018_chrono_live_botnet_seed84_tflite\ann_loss_curve_stable_seed84.png
+
+===== FICHIERS GENERES =====
+Modele Keras       : C:\Users\DELL\Desktop\DDOS12\PFE_DDOS\PFE_DDOS\scripts\ann_final_stable_2018_chrono_live_botnet_seed84_tflite\ann_final_stable_seed84.keras
+Modele TFLite      : C:\Users\DELL\Desktop\DDOS12\PFE_DDOS\PFE_DDOS\scripts\ann_final_stable_2018_chrono_live_botnet_seed84_tflite\ann_final_stable_seed84.tflite
+Scaler joblib      : C:\Users\DELL\Desktop\DDOS12\PFE_DDOS\PFE_DDOS\scripts\ann_final_stable_2018_chrono_live_botnet_seed84_tflite\ann_scaler_stable_seed84.joblib
+Normalisation json : C:\Users\DELL\Desktop\DDOS12\PFE_DDOS\PFE_DDOS\scripts\ann_final_stable_2018_chrono_live_botnet_seed84_tflite\ann_normalization_stable_seed84.json
+Labels json        : C:\Users\DELL\Desktop\DDOS12\PFE_DDOS\PFE_DDOS\scripts\ann_final_stable_2018_chrono_live_botnet_seed84_tflite\ann_labels_stable_seed84.json
+Matrice confusion  : C:\Users\DELL\Desktop\DDOS12\PFE_DDOS\PFE_DDOS\scripts\ann_final_stable_2018_chrono_live_botnet_seed84_tflite\ann_confusion_matrix_stable_seed84.png
+Courbe loss        : C:\Users\DELL\Desktop\DDOS12\PFE_DDOS\PFE_DDOS\scripts\ann_final_stable_2018_chrono_live_botnet_seed84_tflite\ann_loss_curve_stable_seed84.png

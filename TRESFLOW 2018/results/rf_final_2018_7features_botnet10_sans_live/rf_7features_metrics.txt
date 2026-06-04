@@ -1,0 +1,102 @@
+===== RANDOM FOREST FINAL - 2018 7 FEATURES + BOTNET 10 % SANS LIVE =====
+
+===== FICHIERS UTILISES =====
+Train      : C:\Users\DELL\Desktop\DDOS12\PFE_DDOS\PFE_DDOS\scripts\train_2018_9features_botnet10_encoded.csv
+Validation : C:\Users\DELL\Desktop\DDOS12\PFE_DDOS\PFE_DDOS\scripts\val_2018_9features_botnet10_encoded.csv
+Test       : C:\Users\DELL\Desktop\DDOS12\PFE_DDOS\PFE_DDOS\scripts\test_botnet90_9features_external_encoded.csv
+
+===== CONFIGURATION =====
+Best seed         : 0
+N estimators      : 200
+Max depth         : None
+Min samples split : 2
+Min samples leaf  : 1
+Class weight      : balanced
+Nombre features   : 7
+
+===== FEATURES =====
+- Init Bwd Win Bytes
+- Fwd Packet Length Max
+- Fwd Packet Length Std
+- Fwd IAT Min
+- Flow IAT Mean
+- Avg Packet Size
+- Total Fwd Packets
+
+===== DISTRIBUTIONS =====
+Train:
+Label
+0    107428
+1    193828
+Name: count, dtype: int64
+
+Validation:
+Label
+0    89319
+1    11101
+Name: count, dtype: int64
+
+Test:
+Label
+0    515250
+1     47625
+Name: count, dtype: int64
+
+===== RESULTATS VALIDATION =====
+Accuracy validation         : 0.999731
+Precision Attack validation : 0.999639
+Recall Attack validation    : 0.997928
+F1 Attack validation        : 0.998783
+F1 Macro validation         : 0.999316
+Matrice validation [[TN FP], [FN TP]] :
+[[89315     4]
+ [   23 11078]]
+
+===== RESULTATS TEST EXTERNE BOTNET 90 % =====
+Accuracy           : 0.996752
+Precision Attack   : 0.963880
+Recall Attack      : 0.999055
+F1 Attack          : 0.981152
+Precision Macro    : 0.981896
+Recall Macro       : 0.997797
+F1 Macro           : 0.989688
+Precision Weighted : 0.996864
+Recall Weighted    : 0.996752
+F1 Weighted        : 0.996779
+False Positive Rate: 0.003460
+Specificity        : 0.996540
+
+===== MATRICE DE CONFUSION TEST [[TN FP], [FN TP]] =====
+[[513467   1783]
+ [    45  47580]]
+
+===== DETAILS TEST =====
+Total NORMAL test        : 515250
+NORMAL bien classés      : 513467
+NORMAL classés ATTACK    : 1783
+Taux NORMAL bien classés : 0.996540
+
+Total ATTACK test        : 47625
+ATTACK bien détectées    : 47580
+ATTACK ratées NORMAL     : 45
+Taux détection ATTACK    : 0.999055
+
+===== CLASSIFICATION REPORT =====
+              precision    recall  f1-score   support
+
+      NORMAL       1.00      1.00      1.00    515250
+      ATTACK       0.96      1.00      0.98     47625
+
+    accuracy                           1.00    562875
+   macro avg       0.98      1.00      0.99    562875
+weighted avg       1.00      1.00      1.00    562875
+
+
+===== FEATURE IMPORTANCE =====
+Total Fwd Packets : 0.289370
+Init Bwd Win Bytes : 0.233191
+Fwd Packet Length Max : 0.156452
+Fwd IAT Min : 0.140339
+Fwd Packet Length Std : 0.140137
+Flow IAT Mean : 0.029818
+Avg Packet Size : 0.010692
