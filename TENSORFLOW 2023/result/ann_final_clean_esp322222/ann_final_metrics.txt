@@ -1,0 +1,29 @@
+===== RESULTATS TEST FINAL =====
+Best seed          : 21
+Test Loss          : 0.065662
+Test Accuracy      : 0.987521
+Accuracy Score     : 0.987521
+Precision Macro    : 0.976391
+Recall Macro       : 0.951488
+F1 Macro           : 0.963170
+Precision Weighted : 0.987495
+Recall Weighted    : 0.987521
+F1 Weighted        : 0.987331
+
+===== CLASSIFICATION REPORT =====
+                 precision    recall  f1-score   support
+
+  BenignTraffic       0.99      1.00      1.00       892
+DDoS-ICMP_Flood       0.98      0.88      0.93        59
+ DDoS-SYN_Flood       0.97      0.94      0.95        96
+ DDoS-UDP_Flood       0.96      0.99      0.97       155
+
+       accuracy                           0.99      1202
+      macro avg       0.98      0.95      0.96      1202
+   weighted avg       0.99      0.99      0.99      1202
+
+===== CONFUSION MATRIX =====
+[[892   0   0   0]
+ [  3  52   2   2]
+ [  1   1  90   4]
+ [  1   0   1 153]]

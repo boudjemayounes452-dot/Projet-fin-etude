@@ -1,0 +1,97 @@
+===== CNN FINAL + ROBUSTESSE BRUIT REPETE + ADVERSARIAL - CICIoT2023 =====
+
+===== FICHIERS UTILISES =====
+Train      : C:\Users\DELL\Desktop\pfe 2023\result\train_clean.csv
+Validation : C:\Users\DELL\Desktop\pfe 2023\result\val_clean.csv
+Test       : C:\Users\DELL\Desktop\pfe 2023\result\test_clean_no_similarity.csv
+
+===== CONFIGURATION =====
+Best seed       : 21
+Epochs max      : 20
+Epochs executes : 20
+Batch size      : 64
+Learning rate   : 0.001
+Class weights   : {0: 4.090827067669173, 1: 0.6156143923964698, 2: 1.1000404367165386, 3: 0.8182638512903808}
+Robustesse sample size : 1202
+Niveaux bruit : [0.01, 0.03, 0.05, 0.1]
+Repetitions bruit : 5
+Niveaux adversarial : [0.01, 0.03, 0.05, 0.1]
+
+===== FEATURES =====
+- IAT
+- Header_Length
+- Protocol Type
+- flow_duration
+- rst_count
+- Tot size
+- Magnitue
+- AVG
+
+===== CLASSES =====
+0 -> BenignTraffic
+1 -> DDoS-ICMP_Flood
+2 -> DDoS-SYN_Flood
+3 -> DDoS-UDP_Flood
+
+===== ARCHITECTURE CNN =====
+Input : 8 features normalisees reshapees en (8, 1)
+Conv1D 8 filtres, kernel_size=2, ReLU, padding=same
+Flatten
+Dense 8 ReLU
+Dense 4 Softmax
+Loss : categorical_crossentropy
+Optimizer : Adam
+
+===== RESULTATS TEST SANS PERTURBATION =====
+Test Loss          : 0.050888
+Test Accuracy      : 0.990849
+Accuracy Score     : 0.990849
+Precision Macro    : 0.971036
+Recall Macro       : 0.965171
+F1 Macro           : 0.968005
+Precision Weighted : 0.990814
+Recall Weighted    : 0.990849
+F1 Weighted        : 0.990804
+
+===== CLASSIFICATION REPORT =====
+                 precision    recall  f1-score   support
+
+  BenignTraffic       1.00      1.00      1.00       892
+DDoS-ICMP_Flood       0.95      0.92      0.93        59
+ DDoS-SYN_Flood       0.97      0.96      0.96        96
+ DDoS-UDP_Flood       0.97      0.99      0.98       155
+
+       accuracy                           0.99      1202
+      macro avg       0.97      0.97      0.97      1202
+   weighted avg       0.99      0.99      0.99      1202
+
+===== CONFUSION MATRIX =====
+[[892   0   0   0]
+ [  0  54   3   2]
+ [  0   1  92   3]
+ [  0   2   0 153]]
+
+===== ROBUSTESSE BRUIT + ADVERSARIAL =====
+   Dataset Modele     Perturbation Niveau  Accuracy  Accuracy_std  F1_macro  F1_macro_std  Perte_F1_macro
+CICIoT2023 CNN 1D           Aucune     0%  0.990849  0.000000e+00  0.968005      0.000000        0.000000
+CICIoT2023 CNN 1D  Bruit aleatoire     1%  0.990849  1.110223e-16  0.968201      0.000240       -0.000196
+CICIoT2023 CNN 1D  Bruit aleatoire     3%  0.990849  1.110223e-16  0.968299      0.000240       -0.000294
+CICIoT2023 CNN 1D  Bruit aleatoire     5%  0.990682  6.225719e-04  0.968032      0.001798       -0.000026
+CICIoT2023 CNN 1D  Bruit aleatoire    10%  0.988852  1.630276e-03  0.961678      0.005289        0.006327
+CICIoT2023 CNN 1D Adversarial FGSM     1%  0.990849  0.000000e+00  0.968494      0.000000       -0.000489
+CICIoT2023 CNN 1D Adversarial FGSM     3%  0.989185  0.000000e+00  0.964271      0.000000        0.003735
+CICIoT2023 CNN 1D Adversarial FGSM     5%  0.987521  0.000000e+00  0.960047      0.000000        0.007959
+CICIoT2023 CNN 1D Adversarial FGSM    10%  0.985857  0.000000e+00  0.955916      0.000000        0.012090
+
+===== FICHIERS GENERES =====
+Modele Keras final      : C:\Users\DELL\Desktop\pfe 2023\result\cnn_2023_robustesse_bruit_adversarial_moyenne\cnn_final_4classes.keras
+Modele Keras best       : C:\Users\DELL\Desktop\pfe 2023\result\cnn_2023_robustesse_bruit_adversarial_moyenne\cnn_final_4classes_best.keras
+Modele TFLite           : C:\Users\DELL\Desktop\pfe 2023\result\cnn_2023_robustesse_bruit_adversarial_moyenne\cnn_final_4classes.tflite
+Header ESP32 .h         : C:\Users\DELL\Desktop\pfe 2023\result\cnn_2023_robustesse_bruit_adversarial_moyenne\cnn_model_data.h
+Labels json             : C:\Users\DELL\Desktop\pfe 2023\result\cnn_2023_robustesse_bruit_adversarial_moyenne\cnn_labels.json
+Normalisation json      : C:\Users\DELL\Desktop\pfe 2023\result\cnn_2023_robustesse_bruit_adversarial_moyenne\cnn_normalization.json
+Loss curve              : C:\Users\DELL\Desktop\pfe 2023\result\cnn_2023_robustesse_bruit_adversarial_moyenne\cnn_loss_curve.png
+Accuracy curve          : C:\Users\DELL\Desktop\pfe 2023\result\cnn_2023_robustesse_bruit_adversarial_moyenne\cnn_accuracy_curve.png
+Confusion matrix figure : C:\Users\DELL\Desktop\pfe 2023\result\cnn_2023_robustesse_bruit_adversarial_moyenne\cnn_confusion_matrix.png
+CSV robustesse          : C:\Users\DELL\Desktop\pfe 2023\result\cnn_2023_robustesse_bruit_adversarial_moyenne\cnn_robustesse_bruit_adversarial_ciciot2023.csv
+Figure robustesse       : C:\Users\DELL\Desktop\pfe 2023\result\cnn_2023_robustesse_bruit_adversarial_moyenne\cnn_robustesse_bruit_adversarial_ciciot2023.png
