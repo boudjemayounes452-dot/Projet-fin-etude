@@ -1,0 +1,497 @@
+import math
+import time
+import os
+import serial
+from scapy.all import sniff, IP, TCP, UDP, ICMP
+
+# =========================================================
+# CONFIGURATION
+# =========================================================
+
+INTERFACE = "eth0"
+LOCAL_IP = "192.168.1.6"
+TARGET_IP = "192.168.1.1"
+WINDOW_SECONDS = 5
+MIN_PACKETS = 1
+
+CSV_LOG = "/home/kali/ann_live/live_features_esp32_prediction_auto.csv"
+
+SERIAL_PORT = "/dev/ttyUSB0"
+BAUDRATE = 115200
+SERIAL_TIMEOUT = 3
+
+FEATURE_NAMES = [
+    "IAT",
+    "Header_Length",
+    "Protocol Type",
+    "flow_duration",
+    "rst_count",
+    "Tot size",
+    "Magnitue",
+    "AVG"
+]
+
+BPF_FILTER = f"ip and host {TARGET_IP}"
+
+# =========================================================
+# CSV
+# =========================================================
+
+def save_row(
+    detected_mode,
+    raw_features,
+    esp32_pred_label,
+    esp32_confidence,
+    inference_time_us,
+    free_heap,
+    voltage_v,
+    current_ma,
+    power_mw,
+    energy_j,
+    energy_mj,
+    esp32_raw_response
+):
+    os.makedirs(os.path.dirname(CSV_LOG), exist_ok=True)
+    file_exists = os.path.exists(CSV_LOG)
+
+    with open(CSV_LOG, "a", newline="") as f:
+        writer = csv.writer(f)
+
+        if (not file_exists) or os.path.getsize(CSV_LOG) == 0:
+            writer.writerow([
+                "detected_mode",
+                "IAT",
+                "Header_Length",
+                "Protocol Type",
+                "flow_duration",
+                "rst_count",
+                "Tot size",
+                "Magnitue",
+                "AVG",
+                "esp32_pred_label",
+                "esp32_confidence",
+                "inference_time_us",
+                "free_heap",
+                "voltage_v",
+                "current_ma",
+                "power_mw",
+                "energy_j",
+                "energy_mj",
+                "esp32_raw_response"
+            ])
+
+        writer.writerow([detected_mode] + raw_features + [
+            esp32_pred_label,
+            esp32_confidence,
+            inference_time_us,
+            free_heap,
+            voltage_v,
+            current_ma,
+            power_mw,
+            energy_j,
+            energy_mj,
+            esp32_raw_response
+        ])
+
+# =========================================================
+# DETECTION AUTOMATIQUE DU MODE
+# =========================================================
+
+def detect_mode(packets, local_ip, target_ip):
+    ip_packets = [p for p in packets if IP in p]
+    if not ip_packets:
+        return "normal"
+
+    filtered = []
+    for p in ip_packets:
+        src_ip = p[IP].src
+        dst_ip = p[IP].dst
+
+        if src_ip == local_ip or dst_ip == local_ip or src_ip == target_ip or dst_ip == target_ip:
+            filtered.append(p)
+
+    if not filtered:
+        return "normal"
+
+    syn_count = 0
+    udp_count = 0
+    icmp_count = 0
+    tcp_count = 0
+
+    for p in filtered:
+        if TCP in p:
+            tcp_count += 1
+            flags = int(p[TCP].flags)
+            if flags & 0x02:
+                syn_count += 1
+
+        elif UDP in p:
+            udp_count += 1
+
+        elif ICMP in p:
+            icmp_count += 1
+
+    total = len(filtered)
+
+    if syn_count > 0 and syn_count >= max(udp_count, icmp_count) and syn_count >= 0.3 * total:
+        return "syn"
+
+    if udp_count > icmp_count and udp_count > tcp_count:
+        return "udp"
+
+    if icmp_count > udp_count and icmp_count > tcp_count:
+        return "icmp"
+
+    return "normal"
+
+# =========================================================
+# FILTRAGE DES PAQUETS SELON MODE DETECTE
+# =========================================================
+
+def select_flow_packets(ip_packets, local_ip, target_ip, detected_mode):
+    flow_packets = []
+
+    for p in ip_packets:
+        if IP not in p:
+            continue
+
+        src_ip = p[IP].src
+        dst_ip = p[IP].dst
+
+        related = (
+            src_ip == local_ip or dst_ip == local_ip or
+            src_ip == target_ip or dst_ip == target_ip
+        )
+
+        if not related:
+            continue
+
+        if detected_mode == "icmp":
+            if ICMP in p:
+                flow_packets.append(p)
+
+        elif detected_mode == "udp":
+            if UDP in p:
+                flow_packets.append(p)
+
+        elif detected_mode == "syn":
+            if TCP in p:
+                flags = int(p[TCP].flags)
+                if flags & 0x02:
+                    flow_packets.append(p)
+
+        else:
+            flow_packets.append(p)
+
+    return flow_packets
+
+# =========================================================
+# CALCUL DES FEATURES
+# =========================================================
+
+def compute_features_2023(packets, local_ip, target_ip, detected_mode):
+    ip_packets = [p for p in packets if IP in p]
+
+    if len(ip_packets) == 0:
+        return None
+
+    flow_packets = select_flow_packets(
+        ip_packets=ip_packets,
+        local_ip=local_ip,
+        target_ip=target_ip,
+        detected_mode=detected_mode
+    )
+
+    if len(flow_packets) == 0:
+        return None
+
+    flow_packets = sorted(flow_packets, key=lambda p: float(p.time))
+
+    times = [float(p.time) for p in flow_packets]
+    pkt_sizes = [float(len(p)) for p in flow_packets]
+
+    if len(times) > 1:
+        iats = [(times[i] - times[i - 1]) * 1_000_000.0 for i in range(1, len(times))]
+        IAT = sum(iats) / len(iats)
+    else:
+        IAT = 0.0
+
+    header_lengths = []
+
+    for p in flow_packets:
+        h = 0.0
+
+        if IP in p:
+            ihl = int(p[IP].ihl) if p[IP].ihl else 5
+            h += ihl * 4
+
+        if TCP in p:
+            dataofs = int(p[TCP].dataofs) if p[TCP].dataofs else 5
+            h += dataofs * 4
+
+        elif UDP in p:
+            h += 8
+
+        elif ICMP in p:
+            h += 8
+
+        header_lengths.append(h)
+
+    Header_Length = (sum(header_lengths) / len(header_lengths)) if header_lengths else 0.0
+
+    proto_vals = [int(p[IP].proto) for p in flow_packets if IP in p]
+
+    if proto_vals:
+        Protocol_Type = float(max(set(proto_vals), key=proto_vals.count))
+    else:
+        Protocol_Type = 0.0
+
+    if len(times) > 1:
+        flow_duration = max(times) - min(times)
+    else:
+        flow_duration = 0.0
+
+    rst_count = 0.0
+
+    for p in flow_packets:
+        if TCP in p:
+            flags = int(p[TCP].flags)
+            if flags & 0x04:
+                rst_count += 1.0
+
+    if pkt_sizes:
+        Tot_size = sum(pkt_sizes) / len(pkt_sizes)
+    else:
+        Tot_size = 0.0
+
+    Magnitue = math.sqrt(Tot_size) if Tot_size > 0 else 0.0
+    AVG = (sum(pkt_sizes) / len(pkt_sizes)) if pkt_sizes else 0.0
+
+    return [
+        float(IAT),
+        float(Header_Length),
+        float(Protocol_Type),
+        float(flow_duration),
+        float(rst_count),
+        float(Tot_size),
+        float(Magnitue),
+        float(AVG)
+    ]
+
+# =========================================================
+# AFFICHAGE FEATURES
+# =========================================================
+
+def print_features(raw_features):
+    print("\n===== FEATURES CALCULEES =====")
+
+    for i, v in enumerate(raw_features, start=1):
+        print(f"x{i} {FEATURE_NAMES[i - 1]} = {v}")
+
+# =========================================================
+# SERIE VERS ESP32
+# =========================================================
+
+def open_serial():
+    try:
+        ser = serial.Serial(SERIAL_PORT, BAUDRATE, timeout=SERIAL_TIMEOUT)
+        time.sleep(2)
+        print(f"[OK] Port serie ouvert : {SERIAL_PORT}")
+        return ser
+
+    except Exception as e:
+        print(f"[ERREUR] Impossible d'ouvrir le port serie : {e}")
+        return None
+
+def send_features_to_esp32(ser, features):
+    line = ",".join(f"{x:.6f}" for x in features) + "\n"
+    print("\nEnvoi vers ESP32 :", line.strip())
+    ser.write(line.encode())
+
+def read_prediction_from_esp32(ser):
+    try:
+        for _ in range(80):
+            raw_msg = ser.readline().decode(errors="ignore").strip()
+
+            if not raw_msg:
+                continue
+
+            print("ESP32 DEBUG:", raw_msg)
+
+            if raw_msg.startswith("PRED:"):
+                pred_label = "UNKNOWN"
+                pred_conf = 0.0
+                inference_time_us = 0
+                free_heap = 0
+
+                voltage_v = 0.0
+                current_ma = 0.0
+                power_mw = 0.0
+                energy_j = 0.0
+                energy_mj = 0.0
+
+                try:
+                    parts = raw_msg.split(",")
+
+                    for part in parts:
+                        part = part.strip()
+
+                        if part.startswith("PRED:"):
+                            pred_label = part.replace("PRED:", "").strip()
+
+                        elif part.startswith("CONF:"):
+                            pred_conf = float(part.replace("CONF:", "").strip())
+
+                        elif part.startswith("TIME_US:"):
+                            inference_time_us = int(float(part.replace("TIME_US:", "").strip()))
+
+                        elif part.startswith("FREE_HEAP:"):
+                            free_heap = int(float(part.replace("FREE_HEAP:", "").strip()))
+
+                        elif part.startswith("VOLTAGE_V:"):
+                            voltage_v = float(part.replace("VOLTAGE_V:", "").strip())
+
+                        elif part.startswith("CURRENT_MA:"):
+                            current_ma = float(part.replace("CURRENT_MA:", "").strip())
+
+                        elif part.startswith("POWER_MW:"):
+                            power_mw = float(part.replace("POWER_MW:", "").strip())
+
+                        elif part.startswith("ENERGY_J:"):
+                            energy_j = float(part.replace("ENERGY_J:", "").strip())
+
+                        elif part.startswith("ENERGY_MJ:"):
+                            energy_mj = float(part.replace("ENERGY_MJ:", "").strip())
+
+                except Exception:
+                    return "PARSE_ERROR", 0.0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, raw_msg
+
+                return (
+                    pred_label,
+                    pred_conf,
+                    inference_time_us,
+                    free_heap,
+                    voltage_v,
+                    current_ma,
+                    power_mw,
+                    energy_j,
+                    energy_mj,
+                    raw_msg
+                )
+
+        return "NO_PRED_LINE", 0.0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, ""
+
+    except Exception as e:
+        return "SERIAL_READ_ERROR", 0.0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, str(e)
+
+# =========================================================
+# MAIN
+# =========================================================
+
+def main():
+    ser = open_serial()
+
+    if ser is None:
+        print("[STOP] Port serie indisponible.")
+        return
+
+    print("\n=== TEST LIVE KALI -> ESP32 RF + INA219 ===")
+    print("CSV :", CSV_LOG)
+    print("Interface :", INTERFACE)
+    print("LOCAL_IP :", LOCAL_IP)
+    print("TARGET_IP :", TARGET_IP)
+    print("BPF_FILTER :", BPF_FILTER)
+
+    try:
+        while True:
+            print("\n" + "=" * 60)
+            print(f"[INFO] Capture pendant {WINDOW_SECONDS} secondes ...")
+
+            packets = sniff(
+                iface=INTERFACE,
+                timeout=WINDOW_SECONDS,
+                filter=BPF_FILTER
+            )
+
+            print("Nombre de paquets captures :", len(packets))
+
+            if len(packets) == 0:
+                print("Aucun paquet capture.")
+                continue
+
+            if len(packets) < MIN_PACKETS:
+                print("Trop peu de paquets, fenetre ignoree.")
+                continue
+
+            detected_mode = detect_mode(packets, LOCAL_IP, TARGET_IP)
+            print("Mode detecte automatiquement :", detected_mode)
+
+            raw_features = compute_features_2023(
+                packets=packets,
+                local_ip=LOCAL_IP,
+                target_ip=TARGET_IP,
+                detected_mode=detected_mode
+            )
+
+            if raw_features is None:
+                print("Aucune feature calculee.")
+                continue
+
+            print_features(raw_features)
+            send_features_to_esp32(ser, raw_features)
+
+            (
+                esp32_pred_label,
+                esp32_confidence,
+                inference_time_us,
+                free_heap,
+                voltage_v,
+                current_ma,
+                power_mw,
+                energy_j,
+                energy_mj,
+                esp32_raw_response
+            ) = read_prediction_from_esp32(ser)
+
+            print("\n===== RESULTAT CLASSIFICATION (ESP32) =====")
+            print("Mode detecte         :", detected_mode)
+            print("Classe predite ESP32 :", esp32_pred_label)
+            print("Confiance ESP32      :", esp32_confidence)
+            print("Inference time (us)  :", inference_time_us)
+            print("Free heap (bytes)    :", free_heap)
+
+            print("\n===== CONSOMMATION ENERGETIQUE INA219 =====")
+            print("Tension (V)          :", voltage_v)
+            print("Courant (mA)         :", current_ma)
+            print("Puissance (mW)       :", power_mw)
+            print("Energie (J)          :", energy_j)
+            print("Energie (mJ)         :", energy_mj)
+
+            print("\nMessage brut ESP32   :", esp32_raw_response)
+
+            save_row(
+                detected_mode,
+                raw_features,
+                esp32_pred_label,
+                esp32_confidence,
+                inference_time_us,
+                free_heap,
+                voltage_v,
+                current_ma,
+                power_mw,
+                energy_j,
+                energy_mj,
+                esp32_raw_response
+            )
+
+            print("Fenetre sauvegardee dans CSV.")
+
+    except KeyboardInterrupt:
+        print("\n[STOP] Arret manuel.")
+
+    finally:
+        ser.close()
+        print("Port serie ferme.")
+
+if _name_ == "_main_":
+    main()
