@@ -1,0 +1,56 @@
+===== ANN FINAL STABLE + ROBUSTESSE BRUIT + ADVERSARIAL - CICIDS2018 =====
+
+===== FICHIERS UTILISES =====
+Train      : C:\Users\DELL\Desktop\DDOS12\PFE_DDOS\PFE_DDOS\scripts\train_2018_chrono_live_botnet10_encoded.csv
+Validation : C:\Users\DELL\Desktop\DDOS12\PFE_DDOS\PFE_DDOS\scripts\val_2018_chrono_live_botnet10_encoded.csv
+Test       : C:\Users\DELL\Desktop\DDOS12\PFE_DDOS\PFE_DDOS\scripts\test_botnet90_external_chrono_encoded.csv
+
+===== CONFIGURATION =====
+Best seed       : 84
+Epochs max      : 50
+Epochs executes : 41
+Batch size      : 64
+Learning rate   : 0.0005
+Threshold       : 0.5
+Class weights   : {0: 1.4020583062707621, 1: 0.7771439476385242}
+Robustesse sample size : 5000
+Niveaux bruit : [0.01, 0.03, 0.05, 0.1]
+Niveaux adversarial : [0.01, 0.03, 0.05, 0.1]
+
+===== RESULTATS TEST SANS PERTURBATION =====
+Accuracy           : 0.977279
+Precision Attack   : 0.791994
+Recall Attack      : 0.992000
+F1 Attack          : 0.880785
+Precision Macro    : 0.895618
+Recall Macro       : 0.983959
+F1 Macro           : 0.934114
+False Positive Rate: 0.024082
+Specificity        : 0.975918
+
+===== MATRICE DE CONFUSION TEST [[TN FP], [FN TP]] =====
+[[502842  12408]
+ [   381  47244]]
+
+===== ROBUSTESSE BRUIT + ADVERSARIAL =====
+   Dataset Modele     Perturbation Niveau  Accuracy  F1_macro  Perte_F1_macro
+CICIDS2018    ANN           Aucune     0%    0.9786  0.936513        0.000000
+CICIDS2018    ANN  Bruit aleatoire     1%    0.9706  0.915699        0.020814
+CICIDS2018    ANN  Bruit aleatoire     3%    0.9566  0.882463        0.054050
+CICIDS2018    ANN  Bruit aleatoire     5%    0.9386  0.841050        0.095464
+CICIDS2018    ANN  Bruit aleatoire    10%    0.8808  0.735825        0.200689
+CICIDS2018    ANN Adversarial FGSM     1%    0.9440  0.855847        0.080666
+CICIDS2018    ANN Adversarial FGSM     3%    0.8664  0.729349        0.207164
+CICIDS2018    ANN Adversarial FGSM     5%    0.6444  0.391875        0.544638
+CICIDS2018    ANN Adversarial FGSM    10%    0.5342  0.348194        0.588319
+
+===== FICHIERS GENERES =====
+Modele Keras          : C:\Users\DELL\Desktop\DDOS12\PFE_DDOS\PFE_DDOS\scripts\ann_2018_robustesse_bruit_adversarial_light\ann_final_stable_seed84.keras
+Modele TFLite         : C:\Users\DELL\Desktop\DDOS12\PFE_DDOS\PFE_DDOS\scripts\ann_2018_robustesse_bruit_adversarial_light\ann_final_stable_seed84.tflite
+Scaler joblib         : C:\Users\DELL\Desktop\DDOS12\PFE_DDOS\PFE_DDOS\scripts\ann_2018_robustesse_bruit_adversarial_light\ann_scaler_stable_seed84.joblib
+Normalisation json    : C:\Users\DELL\Desktop\DDOS12\PFE_DDOS\PFE_DDOS\scripts\ann_2018_robustesse_bruit_adversarial_light\ann_normalization_stable_seed84.json
+Labels json           : C:\Users\DELL\Desktop\DDOS12\PFE_DDOS\PFE_DDOS\scripts\ann_2018_robustesse_bruit_adversarial_light\ann_labels_stable_seed84.json
+Matrice confusion     : C:\Users\DELL\Desktop\DDOS12\PFE_DDOS\PFE_DDOS\scripts\ann_2018_robustesse_bruit_adversarial_light\ann_confusion_matrix_seed84.png
+Courbe loss           : C:\Users\DELL\Desktop\DDOS12\PFE_DDOS\PFE_DDOS\scripts\ann_2018_robustesse_bruit_adversarial_light\ann_loss_curve_seed84.png
+CSV robustesse        : C:\Users\DELL\Desktop\DDOS12\PFE_DDOS\PFE_DDOS\scripts\ann_2018_robustesse_bruit_adversarial_light\ann_robustesse_bruit_adversarial_cicids2018.csv
+Figure robustesse     : C:\Users\DELL\Desktop\DDOS12\PFE_DDOS\PFE_DDOS\scripts\ann_2018_robustesse_bruit_adversarial_light\ann_robustesse_bruit_adversarial_cicids2018.png
